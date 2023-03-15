@@ -1,0 +1,42 @@
+version: '3.3'
+
+services:
+
+  hangar:
+    image: ubuntu
+    command: bash -c "apt-get update && apt-get install -y iputils-ping && sleep infinity"
+    container_name: hangar
+    networks:
+      usr_network:
+        ipv4_address: 10.0.0.2
+    
+  atelier:
+    image: ubuntu
+    command: bash -c "apt-get update && apt-get install -y iputils-ping && sleep infinity"
+    container_name: atelier
+    networks:
+      usr_network:
+        ipv4_address: 10.0.0.3
+
+  web:
+    image: php:7.2-apache
+    command: sleep infinity
+    container_name: web
+    volumes:
+      - ./DMZ/WEB/sites/:/var/www
+  
+  #db:
+  #image: mysql:latest
+  #expose:
+  #-3306
+  #environement
+  #volume
+  #network
+  #container-name
+
+networks:
+  usr_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.0.0/24
