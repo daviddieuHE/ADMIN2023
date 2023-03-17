@@ -2,6 +2,7 @@ version: '3.3'
 
 services:
 
+#Personnel de WoddyToys
   hangar:
     image: ubuntu
     command: bash -c "apt-get update && apt-get install -y iputils-ping && sleep infinity"
@@ -18,6 +19,40 @@ services:
       usr_network:
         ipv4_address: 10.0.0.3
 
+  secretariat:
+    image: ubuntu
+    command: bash -c "apt-get update && apt-get install -y iputils-ping && sleep infinity"
+    container_name: secretariat
+    networks:
+      usr_network:
+        ipv4_address: 10.0.0.4
+
+  direction:
+    image: ubuntu
+    command: bash -c "apt-get update && apt-get install -y iputils-ping && sleep infinity"
+    container_name: direction
+    networks:
+      usr_network:
+        ipv4_address: 10.0.0.5
+
+  comptabilite:
+    image: ubuntu
+    command: bash -c "apt-get update && apt-get install -y iputils-ping && sleep infinity"
+    container_name: comptabilite
+    networks:
+      usr_network:
+        ipv4_address: 10.0.0.6
+
+  commerciaux:
+    image: ubuntu
+    command: bash -c "apt-get update && apt-get install -y iputils-ping && sleep infinity"
+    container_name: commerciaux
+    networks:
+      usr_network:
+        ipv4_address: 10.0.0.7
+
+
+#serveur web
   web:
     image: php:7.2-apache
     command: sleep infinity
