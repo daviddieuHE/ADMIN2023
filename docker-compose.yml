@@ -2,18 +2,20 @@ version: '3.3'
 
 services:
 
-#Personnel de WoddyToys
+#Personnel de WoodyToys
   hangar:
     image: ubuntu
-    command: bash -c "apt-get update && apt-get install -y iputils-ping && sleep infinity"
+    command: bash -c "apt-get update && apt-get install -y iputils-ping dnsutils curl && sleep infinity"
     container_name: hangar
+    volumes:
+      - ./intranet/resolv.conf:/etc/resolv.conf
     networks:
       usr_network:
         ipv4_address: 10.0.0.2
     
   atelier:
     image: ubuntu
-    command: bash -c "apt-get update && apt-get install -y iputils-ping && sleep infinity"
+    command: bash -c "apt-get update && apt-get install -y iputils-ping dnsutils && sleep infinity"
     container_name: atelier
     networks:
       usr_network:
@@ -21,7 +23,7 @@ services:
 
   secretariat:
     image: ubuntu
-    command: bash -c "apt-get update && apt-get install -y iputils-ping && sleep infinity"
+    command: bash -c "apt-get update && apt-get install -y iputils-ping dnsutils && sleep infinity"
     container_name: secretariat
     networks:
       usr_network:
@@ -29,7 +31,7 @@ services:
 
   direction:
     image: ubuntu
-    command: bash -c "apt-get update && apt-get install -y iputils-ping && sleep infinity"
+    command: bash -c "apt-get update && apt-get install -y iputils-ping dnsutils && sleep infinity"
     container_name: direction
     networks:
       usr_network:
@@ -37,7 +39,7 @@ services:
 
   comptabilite:
     image: ubuntu
-    command: bash -c "apt-get update && apt-get install -y iputils-ping && sleep infinity"
+    command: bash -c "apt-get update && apt-get install -y iputils-ping dnsutils && sleep infinity"
     container_name: comptabilite
     networks:
       usr_network:
@@ -45,20 +47,25 @@ services:
 
   commerciaux:
     image: ubuntu
-    command: bash -c "apt-get update && apt-get install -y iputils-ping && sleep infinity"
+    command: bash -c "apt-get update && apt-get install -y iputils-ping dnsutils && sleep infinity"
     container_name: commerciaux
     networks:
       usr_network:
         ipv4_address: 10.0.0.7
 
-
 #serveur web
   web:
     image: php:7.2-apache
-    command: sleep infinity
+    expose:
+      - 80
+    command: bash -c "service apache2 start && sleep infinity"
     container_name: web
     volumes:
       - ./DMZ/WEB/sites/:/var/www
+      - ./DMZ/WEB/intranet.conf:/etc/apache2/sites-available/intranet.conf
+    networks:
+      usr_network:
+        ipv4_address: 10.0.0.9
   
   #db:
   #image: mysql:latest
@@ -68,6 +75,25 @@ services:
   #volume
   #network
   #container-name
+
+#Resolver(DNS)
+
+  Resolver:
+    image: ubuntu/bind9
+    expose:
+      - 53/udp
+      - 53/tcp
+    command: named -g #lance bind
+    container_name: Resolver
+    networks:
+      usr_network:
+        ipv4_address: 10.0.0.8
+    volumes:
+      - ./intranet/named.conf:/etc/bind/named.conf
+      - ./intranet/woodytoys.lab.zone:/etc/bind/woodytoys.lab.zone
+
+
+#Network
 
 networks:
   usr_network:
