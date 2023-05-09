@@ -1,103 +1,93 @@
-version: '3.3'
+version: '3.8'
 
 services:
 
-#Personnel de WoodyToys
-  hangar:
-    image: ubuntu
-    command: bash -c "apt-get update && apt-get install -y iputils-ping dnsutils curl && sleep infinity"
-    container_name: hangar
+  b2b:
+    build: ./b2b
+    container_name: b2b
+    ports:
+      - "8080:80"
+    networks:
+      woodytoys:
+        ipv4_address:  10.0.0.2
+
+  db:
+    image: mysql
+    container_name: db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: psw
+      MYSQL_DATABASE: woodytoys
+      MYSQL_USER: user
+      MYSQL_PASSWORD: psw
     volumes:
-      - ./intranet/resolv.conf:/etc/resolv.conf
+      - mysql-data:/var/lib/mysql
     networks:
-      usr_network:
-        ipv4_address: 10.0.0.2
-    
-  atelier:
-    image: ubuntu
-    command: bash -c "apt-get update && apt-get install -y iputils-ping dnsutils && sleep infinity"
-    container_name: atelier
-    networks:
-      usr_network:
-        ipv4_address: 10.0.0.3
+      woodytoys:
+        ipv4_address:  10.0.0.3
 
-  secretariat:
-    image: ubuntu
-    command: bash -c "apt-get update && apt-get install -y iputils-ping dnsutils && sleep infinity"
-    container_name: secretariat
+  userdav:
+    build: ./user
+    container_name: userdav
     networks:
-      usr_network:
-        ipv4_address: 10.0.0.4
+      woodytoys:
+        ipv4_address:  10.0.0.4
 
-  direction:
-    image: ubuntu
-    command: bash -c "apt-get update && apt-get install -y iputils-ping dnsutils && sleep infinity"
-    container_name: direction
+  resolver:
+    build: ./resolver
+    container_name: resolver
+    depends_on:
+      - soa
     networks:
-      usr_network:
-        ipv4_address: 10.0.0.5
-
-  comptabilite:
-    image: ubuntu
-    command: bash -c "apt-get update && apt-get install -y iputils-ping dnsutils && sleep infinity"
-    container_name: comptabilite
-    networks:
-      usr_network:
-        ipv4_address: 10.0.0.6
-
-  commerciaux:
-    image: ubuntu
-    command: bash -c "apt-get update && apt-get install -y iputils-ping dnsutils && sleep infinity"
-    container_name: commerciaux
-    networks:
-      usr_network:
-        ipv4_address: 10.0.0.7
-
-#serveur web
-  web:
-    image: php:7.2-apache
-    expose:
-      - 80
-    command: bash -c "service apache2 start && sleep infinity"
-    container_name: web
-    volumes:
-      - ./DMZ/WEB/sites/:/var/www
-      - ./DMZ/WEB/intranet.conf:/etc/apache2/sites-available/intranet.conf
-    networks:
-      usr_network:
-        ipv4_address: 10.0.0.9
+      woodytoys:
+        ipv4_address:  10.0.0.5
   
-  #db:
-  #image: mysql:latest
-  #expose:
-  #-3306
-  #environement
-  #volume
-  #network
-  #container-name
 
-#Resolver(DNS)
-
-  Resolver:
-    image: ubuntu/bind9
-    expose:
-      - 53/udp
-      - 53/tcp
-    command: named -g #lance bind
-    container_name: Resolver
+  soa:
+    build: ./soa
+    container_name: soa
     networks:
-      usr_network:
+      woodytoys:
+        ipv4_address:  10.0.0.6
+  
+  web:
+    build: ./webVitrine
+    container_name: webvitrine
+    ports:
+      - "80:80"
+    networks:
+      woodytoys:
+        ipv4_address:  10.0.0.7
+
+  mail:
+    build: ./mail
+    container_name: mail
+    networks:
+      woodytoys:
         ipv4_address: 10.0.0.8
-    volumes:
-      - ./intranet/named.conf:/etc/bind/named.conf
-      - ./intranet/woodytoys.lab.zone:/etc/bind/woodytoys.lab.zone
-
-
-#Network
+        
+  userthomas:
+    build: ./user
+    container_name: userthomas
+    networks:
+      woodytoys:
+        ipv4_address:  10.0.0.9
+        
+  intranet:
+    build: ./intranet
+    container_name: intranet
+    networks:
+      woodytoys:
+        ipv4_address: 10.0.0.10
 
 networks:
-  usr_network:
+  woodytoys:
+    driver: bridge
     ipam:
       driver: default
       config:
         - subnet: 10.0.0.0/24
+
+volumes:
+  mysql-data:
