@@ -2,15 +2,6 @@ version: '3.8'
 
 services:
 
-  b2b:
-    build: ./b2b
-    container_name: b2b
-    ports:
-      - "8080:80"
-    networks:
-      woodytoys:
-        ipv4_address:  10.0.0.2
-
   db:
     image: mysql
     container_name: db
@@ -50,15 +41,6 @@ services:
     networks:
       woodytoys:
         ipv4_address:  10.0.0.6
-  
-  web:
-    build: ./webVitrine
-    container_name: webvitrine
-    ports:
-      - "80:80"
-    networks:
-      woodytoys:
-        ipv4_address:  10.0.0.7
 
   mail:
     build: ./mail
@@ -73,13 +55,36 @@ services:
     networks:
       woodytoys:
         ipv4_address:  10.0.0.9
-        
   intranet:
     build: ./intranet
     container_name: intranet
     networks:
       woodytoys:
         ipv4_address: 10.0.0.10
+  
+  webpub:
+    build: ./webPub
+    container_name: webpub
+    depends_on:
+      - db
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      woodytoys:
+        ipv4_address: 10.0.0.11
+    volumes:
+      - /etc/ssl/private:/etc/ssl/private
+    
+  soa_externe:
+    build: ./soa_externe
+    container_name: soa_externe
+    ports:
+      - "172.16.1.4:53:53/tcp"
+      - "172.16.1.4:53:53/udp"
+    networks:
+      woodytoys:
+        ipv4_address: 10.0.0.12
 
 networks:
   woodytoys:
