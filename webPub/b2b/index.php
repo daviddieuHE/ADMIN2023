@@ -1,8 +1,8 @@
 <?php
 // Configuration de la base de données
 $servername = "10.0.0.3";  // Nom du conteneur de base de données
-$username = "user";  // Nom d'utilisateur MySQL
-$password = "psw";  // Mot de passe MySQL
+$username = "lecteur";  // Nom d'utilisateur MySQL
+$password = "lecteurpassword";  // Mot de passe MySQL
 $dbname = "woodytoys";  // Nom de la base de données
 
 // Connexion à la base de données
